@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  read_timeout: "5s"
+  write_timeout: "10s"
+
+postgres:
+  dsn: "postgres://pulse:pulse@postgres:5432/pulse?sslmode=disable"
+
+redis:
+  addr: "redis:6379"
+  db: 0
+
+defaults:
+  window_size: "60s"
+  allowed_lateness: "30s"
+  dedup_ttl: "300s"
+  ewma_alpha: 0.3
+  z_score_threshold: 3.0
+  heartbeat_timeout: "180s"
+  alert_cooldown: "300s"
+
+metrics:
+  "api.latency_p99":
+    window_size: "30s"
+    z_score_threshold: 2.5
+    heartbeat_timeout: "60s"
+  "orders.count":
+    ewma_alpha: 0.1
+    alert_cooldown: "600s"

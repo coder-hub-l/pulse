@@ -1,0 +1,15 @@
+server:
+  http_port: 8080
+  grpc_port: 9090
+  redpanda_brokers:
+    - "localhost:9092"
+  raw_events_topic: "events.raw"
+  dlq_topic: "events.dlq"
+  alerts_topic: "events.alerts"
+  clickhouse_dsn: "clickhouse://default:pulse_secret@localhost:9000/pulse"
+  redis_url: "redis://localhost:6379/0"
+  ingest_max_future_skew_sec: 60
+  ingest_max_past_skew_sec: 3600
+  metrics_dir: "configs/metrics"
+  flush_batch_size: 1000
+  flush_interval_ms: 500

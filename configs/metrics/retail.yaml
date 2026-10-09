@@ -1,0 +1,67 @@
+version: "1.0"
+namespace: "retail"
+
+metrics:
+  "retail.store.orders":
+    description: "Real-time store checkout order volume"
+    window:
+      tumbling_sizes: ["1m", "5m", "1h"]
+      allowed_lateness_sec: 30
+      dedup_ttl_sec: 300
+    baselines:
+      seasonal_type: "hour_of_week"
+      min_observations: 10
+      cold_start:
+        inherit_from_dimension: "region"
+    detectors:
+      spike:
+        enabled: true
+        algorithm: "ewma_zscore"
+        alpha: 0.25
+        z_threshold: 3.0
+      drift:
+        enabled: true
+        algorithm: "page_hinkley"
+        delta: 0.1
+        threshold: 15.0
+        alpha: 0.99
+      silence:
+        enabled: true
+        heartbeat_timeout_sec: 120
+    alerting:
+      severity: "critical"
+      cooldown_sec: 300
+      group_by: ["metric_key", "store_id"]
+      sinks:
+        - type: "webhook"
+          url: "http://alert-gateway:8080/alerts"
+
+  "retail.store.wastage":
+    description: "Per-store food and inventory wastage amount"
+    window:
+      tumbling_sizes: ["1h", "1d"]
+      allowed_lateness_sec: 60
+      dedup_ttl_sec: 600
+    baselines:
+      seasonal_type: "hour_of_week"
+      min_observations: 5
+      cold_start:
+        inherit_from_dimension: "region"
+    detectors:
+      spike:
+        enabled: true
+        algorithm: "ewma_zscore"
+        alpha: 0.3
+        z_threshold: 2.5
+      drift:
+        enabled: true
+        algorithm: "page_hinkley"
+        delta: 0.5
+        threshold: 20.0
+        alpha: 0.95
+      silence:
+        enabled: false
+    alerting:
+      severity: "warning"
+      cooldown_sec: 600
+      group_by: ["metric_key", "store_id"]

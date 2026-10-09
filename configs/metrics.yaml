@@ -1,0 +1,46 @@
+server:
+  port: 8080
+  postgres_url: "postgres://pulse:pulse_secret@localhost:5432/pulse_db?sslmode=disable"
+  redis_url: "redis://localhost:6379/0"
+  ingest_max_future_skew_sec: 60
+  ingest_max_past_skew_sec: 3600
+
+metrics:
+  "orders.placed":
+    window_size_sec: 60
+    allowed_lateness_sec: 30
+    dedup_ttl_sec: 300
+    silence_timeout_sec: 0 # Order placement can legitimately be 0 during late hours
+    detector:
+      type: "ewma_zscore"
+      alpha: 0.3
+      z_threshold: 3.0
+      min_samples_for_baseline: 10
+    alerting:
+      cooldown_sec: 300
+
+  "payment.latency_ms":
+    window_size_sec: 30
+    allowed_lateness_sec: 15
+    dedup_ttl_sec: 180
+    silence_timeout_sec: 0
+    detector:
+      type: "ewma_zscore"
+      alpha: 0.4
+      z_threshold: 2.5
+      min_samples_for_baseline: 5
+    alerting:
+      cooldown_sec: 180
+
+  "kitchen.kds_heartbeat":
+    window_size_sec: 60
+    allowed_lateness_sec: 10
+    dedup_ttl_sec: 120
+    silence_timeout_sec: 120 # Alert if no heartbeat from kitchen display system for 2 minutes
+    detector:
+      type: "ewma_zscore"
+      alpha: 0.2
+      z_threshold: 3.0
+      min_samples_for_baseline: 5
+    alerting:
+      cooldown_sec: 300

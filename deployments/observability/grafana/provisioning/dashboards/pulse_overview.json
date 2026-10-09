@@ -1,0 +1,123 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "title": "Throughput (Events/sec)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(pulse_ingest_events_total[1m])) by (status)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "title": "Pipeline Processing Latency (P50 & P99)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(pulse_pipeline_processing_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P99 Latency"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(pulse_pipeline_processing_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P50 Latency"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "title": "Anomalies Detected / sec",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(pulse_detector_anomalies_total[1m])) by (type, severity)",
+          "legendFormat": "{{type}} ({{severity}})"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 4,
+      "title": "Alerts Fired / sec",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(pulse_alert_alerts_fired_total[1m])) by (severity)",
+          "legendFormat": "{{severity}}"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 5,
+      "title": "DLQ Routing & Deduplication Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(pulse_pipeline_dlq_events_total[1m]))",
+          "legendFormat": "DLQ Rate"
+        },
+        {
+          "expr": "sum(rate(pulse_pipeline_deduped_total[1m]))",
+          "legendFormat": "Dedup Rate"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["pulse", "streaming", "anomaly-detection"],
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "utc",
+  "title": "Pulse Streaming Observability Overview",
+  "uid": "pulse-overview"
+}

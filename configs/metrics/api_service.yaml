@@ -1,0 +1,58 @@
+version: "1.0"
+namespace: "api"
+
+metrics:
+  "api.latency.p99":
+    description: "Endpoint P99 response time in milliseconds"
+    window:
+      tumbling_sizes: ["1m", "5m"]
+      allowed_lateness_sec: 15
+      dedup_ttl_sec: 180
+    baselines:
+      seasonal_type: "hour_of_week"
+      min_observations: 10
+      cold_start:
+        inherit_from_dimension: "service"
+    detectors:
+      spike:
+        enabled: true
+        algorithm: "ewma_zscore"
+        alpha: 0.35
+        z_threshold: 2.8
+      drift:
+        enabled: true
+        algorithm: "page_hinkley"
+        delta: 5.0
+        threshold: 25.0
+        alpha: 0.98
+      silence:
+        enabled: true
+        heartbeat_timeout_sec: 60
+    alerting:
+      severity: "critical"
+      cooldown_sec: 180
+      group_by: ["metric_key", "endpoint"]
+
+  "api.errors.count":
+    description: "HTTP 5xx error rate per service"
+    window:
+      tumbling_sizes: ["1m", "5m"]
+      allowed_lateness_sec: 15
+      dedup_ttl_sec: 180
+    baselines:
+      seasonal_type: "hour_of_week"
+      min_observations: 5
+    detectors:
+      spike:
+        enabled: true
+        algorithm: "ewma_zscore"
+        alpha: 0.4
+        z_threshold: 3.0
+      drift:
+        enabled: false
+      silence:
+        enabled: false
+    alerting:
+      severity: "critical"
+      cooldown_sec: 120
+      group_by: ["metric_key", "service"]

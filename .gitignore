@@ -1,0 +1,22 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+coverage.out
+*.test
+
+# Environments and IDE
+.env
+.idea/
+.vscode/
+*.swp
+*~
+
+# ClickHouse / Redpanda local test data
+clickhouse_data/
+redis_data/

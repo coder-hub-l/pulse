@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package pulse.v1;
+
+option go_package = "github.com/pulse/pulse-engine/pkg/proto/pulse/v1;pulsev1";
+
+message EventProto {
+  string event_id = 1;
+  string metric_key = 2;
+  int64 timestamp_unix_ms = 3;
+  double value = 4;
+  map<string, string> dimensions = 5;
+}
+
+message IngestRequest {
+  repeated EventProto events = 1;
+}
+
+message IngestResponse {
+  uint32 accepted_count = 1;
+  uint32 rejected_count = 2;
+  repeated string errors = 3;
+}
+
+service IngestService {
+  rpc IngestEvents(IngestRequest) returns (IngestResponse);
+}

@@ -1,0 +1,33 @@
+version: "1.0"
+namespace: "cloud_cost"
+
+metrics:
+  "cloud.cost.daily_spend":
+    description: "Daily infrastructure spend per cloud service"
+    window:
+      tumbling_sizes: ["1h", "1d"]
+      allowed_lateness_sec: 300
+      dedup_ttl_sec: 3600
+    baselines:
+      seasonal_type: "hour_of_week"
+      min_observations: 7
+      cold_start:
+        inherit_from_dimension: "provider"
+    detectors:
+      spike:
+        enabled: true
+        algorithm: "ewma_zscore"
+        alpha: 0.2
+        z_threshold: 3.0
+      drift:
+        enabled: true
+        algorithm: "page_hinkley"
+        delta: 10.0
+        threshold: 50.0
+        alpha: 0.99
+      silence:
+        enabled: false
+    alerting:
+      severity: "warning"
+      cooldown_sec: 3600
+      group_by: ["metric_key", "service", "provider"]
